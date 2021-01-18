@@ -11,12 +11,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import models.Patient_data;
 
 public class mainBreastCancer {
     public static void main(String[] args) {
-        List<Patient_data> patient_data = readPatientDataFromCsv("C:\\Users\\Firas\\IdeaProjects\\breast_cancer_clean.csv");
+        List<Patient_data> patient_data = readPatientDataFromCsv("breast_cancer_clean.csv");
 
         long totalPatients = patient_data.stream().count();
         long totalBenignTumors = patient_data.stream().filter(v -> v.getDiagnosis().contains("B"))
@@ -64,7 +65,9 @@ public class mainBreastCancer {
 //        Double[] xs = patient_data.stream()
 //                .filter(d -> d.getDiagnosis().equals("B"))
 //                .collect(Collectors.groupingBy(Patient_data::getDiagnosis)).entrySet().stream()
-//                .map(i -> i.getValue().stream().mapToDouble(x -> x.getRadiusMean()));
+//                .map(i -> i.getValue().stream().mapToDouble(x -> x.getRadiusMean()))
+//                .map(arr -> Stream.of(arr).mapToDouble(Number::doubleValue).toArray())
+//                .toArray(double[][]::new);
 
     }
 
