@@ -60,28 +60,81 @@ public class mainBreastCancer {
 
         System.out.println("As we can observe the average radius is bigger in Malignant tumors");
 
-        System.out.println("=== Covariance of the Radius Mean of Benign and Malignant tumors :".toUpperCase());
+        System.out.println("=== Covariance of the Radius Mean and Smoothness Mean of Benign tumors :".toUpperCase());
 
         Map<String,List<Patient_data>> benignPatients = patient_data.stream()
                 .filter(d -> d.getDiagnosis().equals("B"))
                 .collect(Collectors.groupingBy(Patient_data::getDiagnosis));
         List<Patient_data> benignPatientsList = new ArrayList<>();
         benignPatients.values().forEach(benignPatientsList::addAll);
+
+
         double[] benignPatientsRadiusMeanList = new double[benignPatientsList.size()];
         for(int i=0;i<benignPatientsList.size();i++){
             benignPatientsRadiusMeanList[i] = benignPatientsList.get(i).getRadiusMean();
         }
+
+        double[] benignPatientsSmoothnessMeanList = new double[benignPatientsList.size()];
+        for(int i=0;i<benignPatientsList.size();i++){
+            benignPatientsSmoothnessMeanList[i] = benignPatientsList.get(i).getSmoothnessMean();
+        }
+
+        System.out.println(covariance(benignPatientsSmoothnessMeanList,benignPatientsRadiusMeanList));
+
+        System.out.println("=== Covariance of the Radius Mean and Smoothness Mean of Malignant tumors :".toUpperCase());
 
         Map<String,List<Patient_data>> malignantPatients = patient_data.stream()
                 .filter(d -> d.getDiagnosis().equals("M"))
                 .collect(Collectors.groupingBy(Patient_data::getDiagnosis));
         List<Patient_data> malignantPatientsList = new ArrayList<>();
         malignantPatients.values().forEach(malignantPatientsList::addAll);
+
+
         double[] malignantPatientsRadiusMeanList = new double[malignantPatientsList.size()];
         for(int i=0;i<malignantPatientsList.size();i++){
             malignantPatientsRadiusMeanList[i] = malignantPatientsList.get(i).getRadiusMean();
         }
-        System.out.println(covariance(malignantPatientsRadiusMeanList,benignPatientsRadiusMeanList));
+
+        double[] malignantPatientsSmoothnessMeanList = new double[malignantPatientsList.size()];
+        for(int i=0;i<malignantPatientsList.size();i++){
+            malignantPatientsSmoothnessMeanList[i] = malignantPatientsList.get(i).getSmoothnessMean();
+        }
+
+        System.out.println(covariance(malignantPatientsSmoothnessMeanList,malignantPatientsRadiusMeanList));
+
+
+        System.out.println("The negative covariance in both cases is an indication that \nthe movement in one variable is opposite to the movement of the other variable.");
+
+
+        System.out.println("=== Covariance of the Perimeter Mean and Area Mean of Benign tumors :".toUpperCase());
+
+        double[] benignPatientsPerimeterMeanList = new double[benignPatientsList.size()];
+        for(int i=0;i<benignPatientsList.size();i++){
+            benignPatientsPerimeterMeanList[i] = benignPatientsList.get(i).getPerimeterMean();
+        }
+
+        double[] benignPatientsAreaMeanList = new double[benignPatientsList.size()];
+        for(int i=0;i<benignPatientsList.size();i++){
+            benignPatientsAreaMeanList[i] = benignPatientsList.get(i).getAreaMean();
+        }
+
+        System.out.println(covariance(benignPatientsPerimeterMeanList,benignPatientsAreaMeanList));
+
+        System.out.println("=== Covariance of the Perimeter Mean and Area Mean of Malignant tumors :".toUpperCase());
+
+
+        double[] malignantPatientsPerimeterMeanList = new double[malignantPatientsList.size()];
+        for(int i=0;i<malignantPatientsList.size();i++){
+            malignantPatientsPerimeterMeanList[i] = malignantPatientsList.get(i).getRadiusMean();
+        }
+
+        double[] malignantPatientsAreaMeanList = new double[malignantPatientsList.size()];
+        for(int i=0;i<malignantPatientsList.size();i++){
+            malignantPatientsAreaMeanList[i] = malignantPatientsList.get(i).getSmoothnessMean();
+        }
+
+
+        System.out.println(covariance(malignantPatientsPerimeterMeanList,malignantPatientsAreaMeanList));
 
 
 
