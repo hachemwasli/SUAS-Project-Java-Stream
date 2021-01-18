@@ -25,10 +25,7 @@ public class mainBreastCancer {
                 .count();
         System.out.println(" ==== Total number of cases : ".toUpperCase() + totalPatients);
 
-        System.out.println("A benign tumor is not a malignant tumor, which is cancer. It does not invade nearby tissue or spread \n " +
-                "to other parts of the body the way cancer can. In most cases, the outlook with benign \n  " +
-                "tumors is very good. But benign tumors can be serious if they press on vital structures \n " +
-                " such as blood vessels or nerves.");
+        System.out.println("M= Malignant (indicates prescence of cancer cells); B= Benign (indicates abscence of cancer cells)");
         System.out.println(" ");
 
         System.out.print("==== Benign tumors : ".toUpperCase());
@@ -39,21 +36,13 @@ public class mainBreastCancer {
 
         System.out.println(totalMalignantTumors + " | " + (float)(totalMalignantTumors*100/totalPatients)+"% of total cases");
 
-        // Print Average Confirmed Cases For Each Country/Province // Output too long !! Limited !! Remove limit() To See Full Result
-        System.out.println("**** Average Area Mean for each Diagnosis ****\n".toUpperCase());
-//        patient_data.stream().collect(Collectors.groupingBy(Patient_data::getDiagnosis)).entrySet().stream()
-//                .map(i -> i.getValue().stream().mapToDouble(x -> x.getAreaMean()).average().getAsDouble()).forEach(i -> {
-//            patient_data.stream().collect(Collectors.groupingBy(Patient_data::getDiagnosis)).keySet()
-//                    .stream().forEach(c -> System.out.println(c + "= " + i));
-//        });
 
-//        patient_data.stream().collect(Collectors.groupingBy(Patient_data::getDiagnosis)).entrySet().stream()
-//                .map(i -> i.getValue().stream().mapToDouble(x -> x.getAreaMean()).average().getAsDouble()).forEach(i -> System.out.println( "= " + i));
-
+        System.out.println("=== Comparison of Radius Mean of Benign and Malignant tumors :".toUpperCase());
+        System.out.println("Radius mean : average of distances from center to points on the perimeter");
         patient_data.stream()
                 .filter(d -> d.getDiagnosis().equals("M"))
                 .collect(Collectors.groupingBy(Patient_data::getDiagnosis)).entrySet().stream()
-                .map(i -> i.getValue().stream().mapToDouble(x -> x.getAreaMean()).average().getAsDouble())
+                .map(i -> i.getValue().stream().mapToDouble(x -> x.getRadiusMean()).average().getAsDouble())
                 .forEach(i -> {
             patient_data.stream().filter(d -> d.getDiagnosis().equals("M")).collect(Collectors.groupingBy(Patient_data::getDiagnosis)).keySet()
                     .stream().forEach(c -> System.out.println(c + "= " + i));
@@ -61,12 +50,21 @@ public class mainBreastCancer {
         patient_data.stream()
                 .filter(d -> d.getDiagnosis().equals("B"))
                 .collect(Collectors.groupingBy(Patient_data::getDiagnosis)).entrySet().stream()
-                .map(i -> i.getValue().stream().mapToDouble(x -> x.getAreaMean()).average().getAsDouble())
+                .map(i -> i.getValue().stream().mapToDouble(x -> x.getRadiusMean()).average().getAsDouble())
                 .forEach(i -> {
                     patient_data.stream().filter(d -> d.getDiagnosis().equals("B")).collect(Collectors.groupingBy(Patient_data::getDiagnosis)).keySet()
                             .stream().forEach(c -> System.out.println(c + "= " + i));
                 });
 
+        System.out.println("As we can observe the average radius is bigger in Malignant tumors");
+
+        System.out.println("=== Comparison of the Covariance of the Radius Mean of Benign and Malignant tumors :".toUpperCase());
+
+
+//        Double[] xs = patient_data.stream()
+//                .filter(d -> d.getDiagnosis().equals("B"))
+//                .collect(Collectors.groupingBy(Patient_data::getDiagnosis)).entrySet().stream()
+//                .map(i -> i.getValue().stream().mapToDouble(x -> x.getRadiusMean()));
 
     }
 
