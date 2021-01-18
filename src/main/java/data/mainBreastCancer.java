@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -45,9 +46,9 @@ public class mainBreastCancer {
                 .collect(Collectors.groupingBy(Patient_data::getDiagnosis)).entrySet().stream()
                 .map(i -> i.getValue().stream().mapToDouble(x -> x.getRadiusMean()).average().getAsDouble())
                 .forEach(i -> {
-            patient_data.stream().filter(d -> d.getDiagnosis().equals("M")).collect(Collectors.groupingBy(Patient_data::getDiagnosis)).keySet()
-                    .stream().forEach(c -> System.out.println(c + "= " + i));
-        });
+                    patient_data.stream().filter(d -> d.getDiagnosis().equals("M")).collect(Collectors.groupingBy(Patient_data::getDiagnosis)).keySet()
+                            .stream().forEach(c -> System.out.println(c + "= " + i));
+                });
         patient_data.stream()
                 .filter(d -> d.getDiagnosis().equals("B"))
                 .collect(Collectors.groupingBy(Patient_data::getDiagnosis)).entrySet().stream()
@@ -59,15 +60,30 @@ public class mainBreastCancer {
 
         System.out.println("As we can observe the average radius is bigger in Malignant tumors");
 
-        System.out.println("=== Comparison of the Covariance of the Radius Mean of Benign and Malignant tumors :".toUpperCase());
+        System.out.println("=== Covariance of the Radius Mean of Benign and Malignant tumors :".toUpperCase());
+
+        Map<String,List<Patient_data>> benignPatients = patient_data.stream()
+                .filter(d -> d.getDiagnosis().equals("B"))
+                .collect(Collectors.groupingBy(Patient_data::getDiagnosis));
+        List<Patient_data> benignPatientsList = new ArrayList<>();
+        benignPatients.values().forEach(benignPatientsList::addAll);
+        double[] benignPatientsRadiusMeanList = new double[benignPatientsList.size()];
+        for(int i=0;i<benignPatientsList.size();i++){
+            benignPatientsRadiusMeanList[i] = benignPatientsList.get(i).getRadiusMean();
+        }
+
+        Map<String,List<Patient_data>> malignantPatients = patient_data.stream()
+                .filter(d -> d.getDiagnosis().equals("M"))
+                .collect(Collectors.groupingBy(Patient_data::getDiagnosis));
+        List<Patient_data> malignantPatientsList = new ArrayList<>();
+        malignantPatients.values().forEach(malignantPatientsList::addAll);
+        double[] malignantPatientsRadiusMeanList = new double[malignantPatientsList.size()];
+        for(int i=0;i<malignantPatientsList.size();i++){
+            malignantPatientsRadiusMeanList[i] = malignantPatientsList.get(i).getRadiusMean();
+        }
+        System.out.println(covariance(malignantPatientsRadiusMeanList,benignPatientsRadiusMeanList));
 
 
-//        Double[] xs = patient_data.stream()
-//                .filter(d -> d.getDiagnosis().equals("B"))
-//                .collect(Collectors.groupingBy(Patient_data::getDiagnosis)).entrySet().stream()
-//                .map(i -> i.getValue().stream().mapToDouble(x -> x.getRadiusMean()))
-//                .map(arr -> Stream.of(arr).mapToDouble(Number::doubleValue).toArray())
-//                .toArray(double[][]::new);
 
     }
 
@@ -111,7 +127,7 @@ public class mainBreastCancer {
         return Arrays.stream(xs).average().getAsDouble();
     }
 
-    public void RadiusMean_AreaMean(List<Patient_data> patients){
+    public static void RadiusMean_AreaMean(List<Patient_data> patients){
         double[] radiusMean = new double[patients.size()];
         double[] areaMean = new double[patients.size()];
         int i = 0;
@@ -119,9 +135,8 @@ public class mainBreastCancer {
         for (Patient_data patient : patients) {
             radiusMean[i] = patient.getRadiusMean();
             areaMean[i] = patient.getAreaMean();
-            System.out.println("Covariance between radius mean and area mean: "+covariance(radiusMean,areaMean));
-
         }
+        System.out.println("Covariance between radius mean and area mean: "+covariance(radiusMean,areaMean));
     }
 
 //    public void CDF(List<Patient_data> patients){
