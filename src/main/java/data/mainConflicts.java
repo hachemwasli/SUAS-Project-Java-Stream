@@ -44,7 +44,6 @@ public class mainConflicts {
                                          .skip(1)
                                          .map(line -> {
                                              String[] attributes = line
-                                                     .replaceAll(",(?!(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "")
                                                      .split(",");
                                              return new Conflict(attributes);
                                           })
@@ -89,7 +88,10 @@ public class mainConflicts {
         });
         
         //Query 3 start
-        System.out.println(MostViolentActorByCountry(datasetList, "Algeria"));
+        System.out.println("\n*************************************\n");
+        System.out.println("Most Violent Actors by country (Algeria)? \n");
+        MostViolentActor1ByCountry(datasetList, "Algeria")
+                .forEach((k, v) -> System.out.println( k + " : " + v));
     }
     
     
@@ -113,12 +115,12 @@ public class mainConflicts {
     }
     
     // Whats the most participating actor in violent events by countries?
-    public static Map<String, Long> MostViolentActorByCountry(List<Conflict> list, String country){
+    public static Map<String, Long> MostViolentActor1ByCountry(List<Conflict> list, String country){
         return list
                 .stream()
                 .filter( e -> e.getCountry().equalsIgnoreCase(country))
                 .filter( e -> e.isViolent())
-                .collect(Collectors.groupingBy(Conflict::getAssoc_actor1, Collectors.counting()))
+                .collect(Collectors.groupingBy(Conflict::getActor1, Collectors.counting()))
                     ;
     }
     
