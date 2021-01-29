@@ -8,12 +8,17 @@ package data;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import models.Conflict;
 import models.Country;
 
@@ -48,6 +53,9 @@ public class mainConflicts {
                                              return new Conflict(attributes);
                                           })
                                          .collect(Collectors.toList());
+        datasetList.stream()
+                .limit(5)
+                .forEach(System.out::println);
         
         //Getting a list of all countries in the dataset mapped as Name, ISO
         List<Country> countryList = datasetList.stream()
@@ -89,8 +97,27 @@ public class mainConflicts {
         
         //Query 3 start
         System.out.println("\n*************************************\n");
-        System.out.println("Most Violent Actors by country (Algeria)? \n");
-        MostViolentActor1ByCountry(datasetList, "Algeria")
+        System.out.println("Most Violent Actors by country (Algeria) \n");
+        Stream
+                .of(
+                        MostViolentActor1ByCountry(datasetList, "Algeria"),
+                        MostViolentActor2ByCountry(datasetList, "Algeria")
+                )
+                .flatMap(map -> map.entrySet().stream())
+                .sorted(Map.Entry.comparingByValue())
+                .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.summingLong(Map.Entry::getValue)))
+                .forEach((k, v) -> System.out.println( k + " : " + v));
+        
+        //Query 4 start
+//        System.out.println("\n*************************************\n");
+//        System.out.println("Political Militia presence in Africa every year \n");
+//        PoliticalMilitiaPresence(datasetList)
+//                .forEach((k, v) -> System.out.println( k + " : " + v));
+        
+        //Query 4 start
+        System.out.println("\n*************************************\n");
+        System.out.println("Violence against civilians by month \n");
+        ViolanceCiviliansByMonth(datasetList)
                 .forEach((k, v) -> System.out.println( k + " : " + v));
     }
     
@@ -114,7 +141,7 @@ public class mainConflicts {
                 .collect(Collectors.toList());
     }
     
-    // Whats the most participating actor in violent events by countries?
+    // Whats the most participating actors in violent events by countries?
     public static Map<String, Long> MostViolentActor1ByCountry(List<Conflict> list, String country){
         return list
                 .stream()
@@ -123,26 +150,49 @@ public class mainConflicts {
                 .collect(Collectors.groupingBy(Conflict::getActor1, Collectors.counting()))
                     ;
     }
-    
-    // Whats the most participating actor in Violent/Armed events by Region?
-    public List<Conflict> MostViolentActorByRegion(List<Conflict> list, String region){
-        return null;
+    public static Map<String, Long> MostViolentActor2ByCountry(List<Conflict> list, String country){
+        return list
+                .stream()
+                .filter( e -> !e.getActor2().isEmpty())
+                .filter( e -> e.getCountry().equalsIgnoreCase(country))
+                .filter( e -> e.isViolent())
+                .collect(Collectors.groupingBy(Conflict::getActor2, Collectors.counting()))
+                    ;
     }
     
-    // How many peacefull protests in by region?
-    public List<Conflict> AllPeacefulProtestsByRegion(List<Conflict> list, String region){
-        return null;
+    // Political Militia presence by year
+    public static Map<String, Long> PoliticalMilitiaPresence(List<Conflict> list){
+        return list
+                .stream()
+                .map((t) -> {
+                    t.setEvent_date(t.getEvent_date().substring(0, 4));
+                    return t;
+                })
+                .filter( e -> e.getInteraction().contains("3"))
+                .collect(Collectors.groupingBy(Conflict::getEvent_date, Collectors.counting()))
+                    ;
     }
+    
+    // Violance against civilians
+    public static Map<String, Long> ViolanceCiviliansByMonth(List<Conflict> list){
+        return list
+                .stream()
+                .map((t) -> {
+                    LocalDate date = LocalDate.parse(t.getEvent_date(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    t.setEvent_date(date.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH)));
+                    return t;
+                })
+                .filter( e -> e.getInteraction().contains("2"))
+                .collect(Collectors.groupingBy(Conflict::getEvent_date, Collectors.counting()))
+                    ;
+    }
+    
     
     //How many peaceful protests by country?
     public List<Conflict> AllPeacefulProtestsByCountry(List<Conflict> list, String country){
         return null;
     }
     
-    // How many fatalities by year in region?
-    public List<Conflict> CountFatalitiesByYearAndRegion(List<Conflict> list, String region){
-        return null;
-    }
     
     // How many fataliries by year in country?
     public List<Conflict> CountFatalitiesByYearAndCountry(List<Conflict> list, String country){
@@ -158,6 +208,16 @@ public class mainConflicts {
     // Top sources by country
     
     // Number of battles in Africa and top countries
+    
+    //List of all countries
+    public static List<Country> getAllCountries(List<Conflict> list){
+        return list.stream()
+                .filter(distinctByKey(p -> p.getCountry()))
+                .map( a -> {
+                  return new Country(a.getCountry(),a.getIso());
+                })
+                .collect(Collectors.toList());
+    }
     
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Map<Object, Boolean> seen = new ConcurrentHashMap<>();
